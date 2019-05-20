@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="RSS_FEED"
+        android:key="pref_key_rssfeed_settings">
+
+        <Preference
+            android:key="pref_key_change_url"
+            android:title="Insira uma URL"
+            />
+
+        <EditTextPreference
+            android:key="pref_key_change_url_hint"
+            android:title="URL"
+            />
+    </PreferenceCategory>
+
+</PreferenceScreen>

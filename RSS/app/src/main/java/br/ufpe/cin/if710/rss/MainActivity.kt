@@ -1,38 +1,47 @@
 package br.ufpe.cin.if710.rss
 
-import android.app.Activity
+import android.support.v7.app.AppCompatActivity
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.provider.SyncStateContract
+import android.preference.PreferenceManager
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.nio.charset.Charset
 
-class MainActivity : Activity() {
+class MainActivity : AppCompatActivity() {
 
-    companion object {
+    /*companion object {
         private const val RSS_FEED = "http://leopoldomt.com/if1001/g1brasil.xml"
-    }
+    }*/
+    val rssfeed = "rssfeed"
+    var prefs : SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val editor = prefs!!.edit()
+        editor.putString(rssfeed, getString(R.string.rssfeed))
+        editor.apply()
     }
 
     override fun onStart() {
         super.onStart()
 
-        var list : List<ItemRSS> = emptyList()
+        var list : List<ItemRSS>
+        //carregamento assincrono do xml
         doAsync {
-            val feedXML = getRSSFeed(RSS_FEED)
+            val feedXML = getRSSFeed(prefs!!.getString(rssfeed, ""))
             list = ParserRSS.parse(feedXML)
             Log.d("List", list.toString())
 
@@ -40,7 +49,7 @@ class MainActivity : Activity() {
                 conteudoRSS.apply {
                     layoutManager = LinearLayoutManager(applicationContext)
 
-                    //Definindo o adapter - aqui não tem muita diferença de ListView
+                    //Definindo adapter
                     adapter = ItemAdapter(list, applicationContext)
                     Log.d("TESTE", "setou o adapter")
 
@@ -52,6 +61,7 @@ class MainActivity : Activity() {
         }
     }
 
+    //download no xml
     @Throws(IOException::class)
     private fun getRSSFeed(feed : String) : String {
         var rssFeed = ""
@@ -65,4 +75,17 @@ class MainActivity : Activity() {
         Log.d("RSS_FEED", rssFeed)
         return rssFeed
     }
+
+    /*override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.action_editpreferences -> {
+            startActivity(Intent(applicationContext, PreferencesActivity::class.java))
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
+    }*/
 }
